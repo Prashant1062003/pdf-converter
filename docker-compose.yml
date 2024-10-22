@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'  # Map host port 3000 to container port 3000
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./frontend:/app  # Mount the frontend directory for live reloading
+
+  backend:
+    image: backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - '5000:5000'  # Map host port 5000 to container port 5000
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongo:27017/mydatabase  # Example for MongoDB connection
+    volumes:
+      - ./backend:/app  # Mount the backend directory for live reloading
+    depends_on:
+      - mongo  # Wait for MongoDB to start
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - '27017:27017'  # Map host port 27017 to container port 27017
+    volumes:
+      - mongo_data:/data/db  # Persist MongoDB data
+
+volumes:
+  mongo_data:  # Define a volume for MongoDB data persistence
